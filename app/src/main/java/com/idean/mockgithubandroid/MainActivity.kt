@@ -6,8 +6,11 @@ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterF
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Path
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,9 +20,9 @@ class MainActivity : AppCompatActivity() {
 
     val service = Retrofit.Builder()
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .addConverterFactory(GsonConverterFactory.create()) //pour parser le JSON
+        .addConverterFactory(GsonConverterFactory.create()) //to parse the JSON
         .client(okHttpClient)
-        .baseUrl("https://"+BuildConfig.urlServer) //domaine de l'API
+        .baseUrl("https://"+BuildConfig.urlServer) //API domain
         .build()
         .create(MockGithubApiService::class.java)
 
@@ -36,3 +39,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+interface MockGithubApiService {
+    @GET("users/{login}")
+    fun getUser(
+        @Path("login") login: String
+    ): Deferred<Response<User>>
+}
+
+class User(
+    var id: Int,
+    var name: String,
+    var login: String
+)
